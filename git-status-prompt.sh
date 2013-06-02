@@ -6,11 +6,12 @@ if git status -b -s > $tmp 2>/dev/null
 then
   echo -ne "("
   BRANCH_LINE=$(grep '^##' $tmp | colrm 1 3)
-  echo -ne "\e[01;35m"$(echo $BRANCH_LINE | sed 's/\..*//')"\e[0m"
+  echo -ne "\e[01;35m"$(echo $BRANCH_LINE | sed 's/\.\.\..*//')"\e[0m"
   if echo $BRANCH_LINE | grep behind >/dev/null
   then
    echo -ne "↓"$(echo $BRANCH_LINE | sed 's/.* \([0-9]\+\)\]/\1/')
-  elif echo $BRANCH_LINE | grep ahead >/dev/null
+  fi
+  if echo $BRANCH_LINE | grep ahead >/dev/null
   then
     echo -ne "↑"$(echo $BRANCH_LINE | sed 's/.* \([0-9]\+\)\]/\1/')
   fi
