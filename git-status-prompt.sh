@@ -16,22 +16,29 @@ then
     echo -ne "↑"$(echo $BRANCH_LINE | sed 's/.* \([0-9]\+\)\]/\1/')
   fi
 
-  STAGED=$(grep '^[MADRC]' $tmp | wc -l)
-  if [ $STAGED -gt 0 ]
+  CONFLICT=$(grep '^\(DD\|AA\|.U\|U.\)' $tmp | wc -l)
+  if [ $CONFLICT -gt 0 ]
   then
-    echo -ne "|\001\033[01;32m\002"s$STAGED"\001\033[0m\002"
+    echo -ne "|\001\033[01;31m\002"C$CONFLICT"\001\033[0m\002"
   fi
 
-  NOTSTAGED=$(grep '^.[MD]' $tmp | wc -l)
+
+  STAGED=$(grep '^\([MARC]\|D[ M]\)' $tmp | wc -l)
+  if [ $STAGED -gt 0 ]
+  then
+    echo -ne "|\001\033[01;33m\002"S$STAGED"\001\033[0m\002"
+  fi
+
+  NOTSTAGED=$(grep '^\([ MARC][MD]\|DM\)' $tmp | wc -l)
   if [ $NOTSTAGED -gt 0 ]
   then
-    echo -ne "|\001\033[01;31m\002"m$NOTSTAGED"\001\033[0m\002"
+    echo -ne "|\001\033[01;34m\002"M$NOTSTAGED"\001\033[0m\002"
   fi
 
   UNTRACKED=$(grep '??' $tmp | wc -l)
   if [ $UNTRACKED -gt 0 ]
   then
-    echo -ne "|\001\033[01;33m\002"u$UNTRACKED"\001\033[0m\002"
+    echo -ne "|\001\033[01;36m\002"U$UNTRACKED"\001\033[0m\002"
   fi
 
   echo -ne ")"
