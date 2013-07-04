@@ -2,21 +2,27 @@
 
 tmp=$(mktemp)
 
-if git status -b -s > $tmp 2>/dev/null
+if git status --porcelain > $tmp 2>/dev/null
 then
+  BRANCH=$(git symbolic-ref HEAD)
+  BRANCH=${BRANCH#refs/heads/}
   echo -ne "("
-  BRANCH_LINE=$(grep '^##' $tmp | colrm 1 3)
   echo -ne "\001\033[01;35m\002"
-  echo -n $BRANCH_LINE | sed 's/\.\.\..*//'
+  echo -n $BRANCH
   echo -ne "\001\033[0m\002"
 
-  if echo $BRANCH_LINE | grep behind >/dev/null
+  REMOTE=$(git config branch.$BRANCH.remote)
+  UPSTREAM=$(git config branch.$BRANCH.merge)
+  UPSTREAM=${UPSTREAM#refs/heads/}
+  AHEAD=$(git log $REMOTE/$UPSTREAM..$BRANCH --oneline | wc -l)
+  BEHIND=$(git log $BRANCH..$REMOTE/$UPSTREAM --oneline | wc -l)
+  if [[ $BEHIND -gt 0 ]]
   then
-   echo -ne "↓"$(echo $BRANCH_LINE | sed 's/.* \([0-9]\+\)\]/\1/')
+   echo -ne "↓"$BEHIND
   fi
-  if echo $BRANCH_LINE | grep ahead >/dev/null
+  if [[ $AHEAD -gt 0 ]]
   then
-    echo -ne "↑"$(echo $BRANCH_LINE | sed 's/.* \([0-9]\+\)\]/\1/')
+    echo -ne "↑"$AHEAD
   fi
 
   CONFLICT=$(grep '^\(DD\|AA\|.U\|U.\)' $tmp | wc -l)
