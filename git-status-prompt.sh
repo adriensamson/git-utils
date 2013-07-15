@@ -11,18 +11,23 @@ then
   echo -n $BRANCH
   echo -ne "\001\033[0m\002"
 
-  REMOTE=$(git config branch.$BRANCH.remote)
-  UPSTREAM=$(git config branch.$BRANCH.merge)
+  REMOTE=$(git config branch.$BRANCH.remote || echo origin)
+  UPSTREAM=$(git config branch.$BRANCH.merge || echo $BRANCH)
   UPSTREAM=${UPSTREAM#refs/heads/}
-  AHEAD=$(git log $REMOTE/$UPSTREAM..$BRANCH --oneline | wc -l)
-  BEHIND=$(git log $BRANCH..$REMOTE/$UPSTREAM --oneline | wc -l)
-  if [[ $BEHIND -gt 0 ]]
+  if git rev-parse -q --verify $REMOTE/$BRANCH >/dev/null
   then
-   echo -ne "↓"$BEHIND
-  fi
-  if [[ $AHEAD -gt 0 ]]
-  then
-    echo -ne "↑"$AHEAD
+    AHEAD=$(git log $REMOTE/$UPSTREAM..$BRANCH --oneline | wc -l)
+    BEHIND=$(git log $BRANCH..$REMOTE/$UPSTREAM --oneline | wc -l)
+    if [[ $BEHIND -gt 0 ]]
+    then
+      echo -ne "↓"$BEHIND
+    fi
+    if [[ $AHEAD -gt 0 ]]
+    then
+      echo -ne "↑"$AHEAD
+    fi
+  else
+    echo -n _
   fi
 
   CONFLICT=$(grep '^\(DD\|AA\|.U\|U.\)' $tmp | wc -l)
