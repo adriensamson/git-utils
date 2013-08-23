@@ -4,30 +4,43 @@ tmp=$(mktemp)
 
 if git status --porcelain > $tmp 2>/dev/null
 then
-  BRANCH=$(git symbolic-ref HEAD)
-  BRANCH=${BRANCH#refs/heads/}
   echo -ne "("
   echo -ne "\001\033[01;35m\002"
-  echo -n $BRANCH
-  echo -ne "\001\033[0m\002"
 
-  REMOTE=$(git config branch.$BRANCH.remote || echo origin)
-  UPSTREAM=$(git config branch.$BRANCH.merge || echo $BRANCH)
-  UPSTREAM=${UPSTREAM#refs/heads/}
-  if git rev-parse -q --verify $REMOTE/$BRANCH >/dev/null
+  if git symbolic-ref -q HEAD >/dev/null
   then
-    AHEAD=$(git log $REMOTE/$UPSTREAM..$BRANCH --oneline | wc -l)
-    BEHIND=$(git log $BRANCH..$REMOTE/$UPSTREAM --oneline | wc -l)
-    if [[ $BEHIND -gt 0 ]]
+    BRANCH=$(git symbolic-ref --short HEAD)
+    echo -n $BRANCH
+    echo -ne "\001\033[0m\002"
+
+    REMOTE=$(git config branch.$BRANCH.remote || echo origin)
+    UPSTREAM=$(git config branch.$BRANCH.merge || echo $BRANCH)
+    UPSTREAM=${UPSTREAM#refs/heads/}
+    if git rev-parse -q --verify $REMOTE/$BRANCH >/dev/null
     then
-      echo -ne "↓"$BEHIND
-    fi
-    if [[ $AHEAD -gt 0 ]]
-    then
-      echo -ne "↑"$AHEAD
+      AHEAD=$(git log $REMOTE/$UPSTREAM..$BRANCH --oneline | wc -l)
+      BEHIND=$(git log $BRANCH..$REMOTE/$UPSTREAM --oneline | wc -l)
+      if [[ $BEHIND -gt 0 ]]
+      then
+        echo -ne "↓"$BEHIND
+      fi
+      if [[ $AHEAD -gt 0 ]]
+      then
+        echo -ne "↑"$AHEAD
+      fi
+    else
+      echo -n _
     fi
   else
-    echo -n _
+    COMMIT=$(git log -1 --format=format:%H)
+    TAG=$(git tag --points-at $COMMIT)
+    if [ ! -z "$TAG" ]
+    then
+        echo -n ':'$TAG
+    else
+        echo -n ':'${COMMIT:0:6}
+    fi
+    echo -ne "\001\033[0m\002"
   fi
 
   CONFLICT=$(grep '^\(DD\|AA\|.U\|U.\)' $tmp | wc -l)
