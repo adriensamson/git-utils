@@ -1,0 +1,71 @@
+#!/bin/bash
+
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
+
+DRY_RUN=
+DO_LOCAL=
+DO_ALL_REMOTES=
+DO_REMOTES=
+
+function clean_local {
+    for b in $(git branch --merged | colrm 1 2 | grep -v "^$CURRENT_BRANCH$")
+    do
+        $DRY_RUN git branch -d $b
+    done
+}
+
+function clean_remote {
+    local REMOTE=$1
+    $DRY_RUN git fetch -p $REMOTE
+    REMOTE_HEAD=$(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/HEAD" | awk '{print $3}')
+    for b in $(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/" | grep -v "^$REMOTE_HEAD$" | grep -v "^$REMOTE/HEAD")
+    do
+        $DRY_RUN git push $REMOTE :${b#$REMOTE/}
+    done
+}
+
+while [ $# -gt 0 ]
+do
+    case "$1" in
+        "--local"|"-l")
+            DO_LOCAL=1
+        ;;
+        "--remotes"|"-r")
+            DO_ALL_REMOTES=1
+        ;;
+        "--all"|"-a")
+            DO_LOCAL=1
+            DO_ALL_REMOTES=1
+        ;;
+        "--dry-run"|"-n")
+            DRY_RUN=echo
+        ;;
+        *)
+            DO_REMOTES="$DO_REMOTES $1"
+        ;;
+    esac
+    shift 1
+done
+
+if [ -z "$DO_LOCAL$DO_ALL_REMOTES$DO_REMOTES" ]
+then
+    DO_LOCAL=1
+fi
+
+if [ -n "$DO_LOCAL" ]
+then
+    clean_local
+fi
+
+if [ -n "$DO_ALL_REMOTES" ]
+then
+    DO_REMOTES=$(git remote)
+fi
+
+if [ -n "$DO_REMOTES" ]
+then
+    for r in $DO_REMOTES
+    do
+        clean_remote "$r"
+    done
+fi
