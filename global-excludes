@@ -1,0 +1,11 @@
+# eclipse
+.project
+.settings
+.buildpath
+# netbeans
+nbproject
+# phpStorm
+.idea
+
+# backup files
+*~
