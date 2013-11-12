@@ -2,7 +2,7 @@
 
 CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
 
-DRY_RUN=
+DRY_RUN="echo"
 DO_LOCAL=
 DO_ALL_REMOTES=
 DO_REMOTES=
@@ -37,8 +37,8 @@ do
             DO_LOCAL=1
             DO_ALL_REMOTES=1
         ;;
-        "--dry-run"|"-n")
-            DRY_RUN=echo
+        "--do-it"|"--force"|"-f")
+            DRY_RUN=
         ;;
         *)
             DO_REMOTES="$DO_REMOTES $1"
