@@ -9,3 +9,4 @@
     nb = checkout -b
     co = checkout
     ci = commit
+    l = log --graph --decorate
