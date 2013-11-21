@@ -16,7 +16,7 @@ function clean_local {
 
 function clean_remote {
     local REMOTE=$1
-    $DRY_RUN git fetch -p $REMOTE
+    git fetch -p $REMOTE
     REMOTE_HEAD=$(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/HEAD" | awk '{print $3}')
     for b in $(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/" | grep -v "^$REMOTE_HEAD$" | grep -v "^$REMOTE/HEAD")
     do
