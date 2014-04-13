@@ -10,3 +10,6 @@
     co = checkout
     ci = commit
     l = log --graph --decorate
+
+    uu = !git pull --ff-only upstream $(git symbolic-ref HEAD | sed 's/refs\\/heads\\///')
+    ru = !git pull --rebase upstream $(git symbolic-ref HEAD | sed 's/refs\\/heads\\///')
