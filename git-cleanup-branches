@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_BRANCH=$(git symbolic-ref --short HEAD)
+BASE_BRANCH="master"
 
 DRY_RUN="echo"
 DO_LOCAL=
@@ -8,7 +8,7 @@ DO_ALL_REMOTES=
 DO_REMOTES=
 
 function clean_local {
-    for b in $(git branch --merged | colrm 1 2 | grep -v "^$CURRENT_BRANCH$")
+    for b in $(git branch --merged $BASE_BRANCH | colrm 1 2 | grep -v "^$BASE_BRANCH$")
     do
         $DRY_RUN git branch -d $b
     done
@@ -17,8 +17,7 @@ function clean_local {
 function clean_remote {
     local REMOTE=$1
     git fetch -p $REMOTE
-    REMOTE_HEAD=$(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/HEAD" | awk '{print $3}')
-    for b in $(git branch -r --merged | colrm 1 2 | grep "^$REMOTE/" | grep -v "^$REMOTE_HEAD$" | grep -v "^$REMOTE/HEAD")
+    for b in $(git branch -r --merged $BASE_BRANCH | colrm 1 2 | grep "^$REMOTE/" | grep -v "^$REMOTE/$BASE_BRANCH" | grep -v "^$REMOTE/HEAD")
     do
         $DRY_RUN git push $REMOTE :${b#$REMOTE/}
     done
