@@ -2,7 +2,7 @@
 
 tmp=$(mktemp)
 
-if git status --porcelain > $tmp 2>/dev/null
+if git status --porcelain -uall > $tmp 2>/dev/null
 then
   echo -ne "("
   echo -ne "\001\033[01;35m\002"
