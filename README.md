@@ -12,6 +12,11 @@ For instance, mine is
 PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]$(git-status-prompt)\$ '
 ```
 
+Quick install script:
+```
+sed -i "s@\(\\\\\]\)\(\\\\\$ '\)@\1\$($(pwd)/git-status-prompt)\2@" ~/.bashrc
+```
+
 ## Aliases
 
 * `git a` adds all files to staging area
@@ -32,6 +37,14 @@ In your `~/.gitconfig`:
         path = /path/to/git-utils/aliases
 ```
 
+Quick install script:
+```
+cat >>~/.gitconfig <<eof
+[include]
+    path = $(pwd)/aliases
+eof
+```
+
 ## Global excludes
 
 ### Installation
@@ -40,4 +53,12 @@ In your `~/.gitconfig`:
 ```
 [core]
         excludesfile = /path/to/git-utils/global-excludes
+```
+
+Quick install script:
+```
+cat >>~/.gitconfig <<eof
+[core]
+    excludefiles = $(pwd)/global-excludes
+eof
 ```
