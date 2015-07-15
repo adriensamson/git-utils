@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tmp=$(mktemp)
+tmp=$(mktemp -t gstp.XXXXXXXX)
 
 if git status --porcelain -uall > $tmp 2>/dev/null
 then
