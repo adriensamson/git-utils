@@ -59,6 +59,6 @@ Quick install script:
 ```
 cat >>~/.gitconfig <<eof
 [core]
-    excludefiles = $(pwd)/global-excludes
+    excludesfile = $(pwd)/global-excludes
 eof
 ```
