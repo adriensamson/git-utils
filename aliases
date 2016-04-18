@@ -4,8 +4,8 @@
     u = pull --ff-only
     s = status
     a = add -A :/
-    d = diff
-    ds = diff --staged
+    d = diff -M
+    ds = diff -M --staged
     nb = checkout -b
     co = checkout
     ci = commit
