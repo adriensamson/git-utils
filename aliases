@@ -1,6 +1,7 @@
 [alias]
     r = pull --rebase
     p = !git push -u origin $(git symbolic-ref HEAD | sed 's/refs\\/heads\\///')
+    pf = !git push -u --force-with-lease origin $(git symbolic-ref HEAD | sed 's/refs\\/heads\\///')
     u = pull --ff-only
     s = status
     a = add -A :/
