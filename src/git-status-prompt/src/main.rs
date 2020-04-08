@@ -4,6 +4,10 @@ use std::env::current_dir;
 
 fn main() {
     if let Ok(repo) = Repository::discover(current_dir().unwrap()) {
+        if repo.is_empty().unwrap() {
+            println!("(empty)");
+            return;
+        }
         print!("(");
 
         let head = repo.head().unwrap();
