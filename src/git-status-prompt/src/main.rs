@@ -7,7 +7,7 @@ fn main() {
 
         match output_as_option(get_branch_name()) {
             Some(branch) => {
-                print!("\x1B[01;35m{}\x1B[0m", branch.trim());
+                print_in_color(ConsoleColor::Magenta, branch.trim());
 
                 let remote = output_as_option(get_config(&format!("branch.{}.remote", branch.trim())))
                     .and_then(|s| Some(String::from(s.trim())))
@@ -33,10 +33,10 @@ fn main() {
                 if let Some(commit) = output_as_option(get_commit()) {
                     match output_as_option(get_tag(&commit)) {
                         Some(tag) => {
-                            print!("\x1B[01;35m:{}\x1B[0m", tag.trim());
+                            print_in_color(ConsoleColor::Magenta, tag.trim());
                         }
                         None => {
-                            print!("\x1B[01;35m:{}\x1B[0m", &commit[0..6]);
+                            print_in_color(ConsoleColor::Magenta, &commit[0..6]);
                         }
                     }
                 }
@@ -45,16 +45,20 @@ fn main() {
 
         let status = parse_status(&output_as_option(status).unwrap());
         if status.conflicts > 0 {
-            print!("|\x1B[01;31m{}\x1B[0m", status.conflicts);
+            print!("|");
+            print_in_color(ConsoleColor::Red, &format!("{}", status.conflicts));
         }
         if status.staged > 0 {
-            print!("|\x1B[01;33m{}\x1B[0m", status.staged);
+            print!("|");
+            print_in_color(ConsoleColor::Yellow, &format!("{}", status.staged));
         }
         if status.notstaged > 0 {
-            print!("|\x1B[01;34m{}\x1B[0m", status.notstaged);
+            print!("|");
+            print_in_color(ConsoleColor::Blue, &format!("{}", status.notstaged));
         }
         if status.untracked > 0 {
-            print!("|\x1B[01;36m{}\x1B[0m", status.untracked);
+            print!("|");
+            print_in_color(ConsoleColor::Cyan, &format!("{}", status.untracked));
         }
 
         print!(")");
@@ -165,4 +169,19 @@ fn parse_status(status : &str) -> Status {
     }
 
     res
+}
+
+enum ConsoleColor {
+    //Black = 30,
+    Red = 31,
+    //Green = 32,
+    Yellow = 33,
+    Blue = 34,
+    Magenta = 35,
+    Cyan = 36,
+    //White = 37,
+}
+
+fn print_in_color(color : ConsoleColor, text : &str) {
+    print!("\x1B[01;{}m{}\x1B[0m", color as i32, text);
 }
