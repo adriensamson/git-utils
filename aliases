@@ -10,6 +10,7 @@
     nb = checkout -b
     co = checkout
     ci = commit
+    sw = switch
     l = log --graph --decorate
 
     uu = !git pull --ff-only upstream $(git symbolic-ref HEAD | sed 's/refs\\/heads\\///')
