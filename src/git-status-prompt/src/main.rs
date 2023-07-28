@@ -107,5 +107,5 @@ enum ConsoleColor {
 }
 
 fn print_in_color(color : ConsoleColor, text : &str) {
-    print!("\x1B[01;{}m{}\x1B[0m", color as i32, text);
+    print!("\x01\x1B[01;{}m\x02{}\x01\x1B[0m\x02", color as i32, text);
 }
